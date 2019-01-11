@@ -3,8 +3,8 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <gazebo/gazebo.hh>
+#include <gazebo/physics/physics.hh>
 #include <gazebo/sensors/SensorsIface.hh>
-#include "gazebo/physics/physics.hh"
 #include <mutex>  // NOLINT
 
 namespace py = pybind11;
@@ -79,12 +79,15 @@ PYBIND11_MODULE(social_bot, m) {
 
   // World class
   py::class_<World>(m, "World")
-    .def("step", &World::Step, "Run world for steps", py::arg("steps") = 1)
-    .def("insertModelFromSdfString", &World::InsertModelFromSdfString, "Insert model from sdf string",
-         py::arg("sdfString"))
-    .def("insertModelFile", &World::InsertModelFile, "Insert model from file",
-         py::arg("fileName"));
-
+      .def("step", &World::Step, "Run world for steps", py::arg("steps") = 1)
+      .def("insertModelFromSdfString",
+           &World::InsertModelFromSdfString,
+           "Insert model from sdf string",
+           py::arg("sdfString"))
+      .def("insertModelFile",
+           &World::InsertModelFile,
+           "Insert model from file",
+           py::arg("fileName"));
 }
 
 }  // namespace social_bot
