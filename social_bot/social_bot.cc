@@ -3,11 +3,11 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <gazebo/gazebo.hh>
-#include <gazebo/physics/physics.hh>
 #include <gazebo/physics/Joint.hh>
 #include <gazebo/physics/JointController.hh>
 #include <gazebo/physics/Model.hh>
 #include <gazebo/physics/World.hh>
+#include <gazebo/physics/physics.hh>
 #include <gazebo/sensors/SensorsIface.hh>
 
 #include <mutex>  // NOLINT
@@ -76,7 +76,6 @@ class World {
 };
 
 void Initialize(const std::vector<std::string>& args) {
-  gazebo::common::Console::SetQuiet(false);
   static std::once_flag flag;
   std::call_once(flag, [&args]() {
     gazebo::common::Console::SetQuiet(false);

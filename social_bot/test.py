@@ -1,7 +1,7 @@
 # Copyright (c) 2019 Horizon Robotics. All Rights Reserved.
 
 import social_bot as bot
-bot.initialize(["abc", "--verbose"])
+bot.initialize()
 
 world = bot.new_world_from_file("pioneer2dx_camera.world")
 
