@@ -8,6 +8,10 @@
 #include <gazebo/physics/Model.hh>
 #include <gazebo/physics/World.hh>
 #include <gazebo/physics/physics.hh>
+#include <gazebo/rendering/Camera.hh>
+#include <gazebo/sensors/CameraSensor.hh>
+#include <gazebo/sensors/Sensor.hh>
+#include <gazebo/sensors/SensorManager.hh>
 #include <gazebo/sensors/SensorsIface.hh>
 
 #include <mutex>  // NOLINT
@@ -17,6 +21,22 @@ namespace py = pybind11;
 namespace social_bot {
 
 class Observation;
+
+class CameraObservation {
+ public:
+  CameraObservation(size_t width, size_t height, size_t depth, uint8_t* data)
+      : width_(width), height_(height), depth_(depth), data_(data) {}
+
+  uint8_t* data() { return data_; }
+  size_t width() { return width_; }
+  size_t height() { return height_; }
+  size_t depth() { return depth_; }
+
+ private:
+  size_t width_, height_, depth_;
+  uint8_t* data_;
+};
+
 class Action;
 
 class Model {
@@ -64,6 +84,39 @@ class Agent : public Model {
     }
     return names;
   }
+
+  std::vector<std::string> GetSensorNames() {
+    std::vector<std::string> sensorNames;
+    gazebo::sensors::SensorManager* mgr =
+        gazebo::sensors::SensorManager::Instance();
+    sensorNames.reserve(mgr->GetSensors().size());
+
+    for (auto sensor : mgr->GetSensors()) {
+      sensorNames.push_back(sensor->Name());
+      std::cout << " sensor name: " << sensor->Name()
+                << ", scoped name: " << sensor->ScopedName() << std::endl;
+    }
+    return sensorNames;
+  }
+
+  CameraObservation GetCameraObservation(const std::string& sensorName) {
+    gazebo::sensors::SensorManager* mgr =
+        gazebo::sensors::SensorManager::Instance();
+    gazebo::sensors::CameraSensorPtr sensor =
+        std::dynamic_pointer_cast<gazebo::sensors::CameraSensor>(
+            mgr->GetSensor(sensorName));
+
+    auto cameraPtr = sensor->Camera();
+
+    return CameraObservation(
+        sensor->ImageWidth(),
+        sensor->ImageHeight(),
+        cameraPtr->ImageDepth(),
+        // const char* => uint8_t*
+        const_cast<uint8_t*>(
+            reinterpret_cast<const uint8_t*>(sensor->ImageData())));
+  }
+
   bool TakeAction(const std::map<std::string, double>& forces) {
     auto controller = model_->GetJointController();
     for (const auto& name2force : forces) {
@@ -93,13 +146,16 @@ class World {
     }
     return std::make_unique<Agent>(world_->ModelByName(name));
   }
+
   std::unique_ptr<Model> GetModel(const std::string& name) {
     return std::make_unique<Model>(world_->ModelByName(name));
   }
+
   void Step(int num_steps) {
     gazebo::runWorld(world_, num_steps);
     gazebo::sensors::run_once();
   }
+
   void InsertModelFile(const std::string& fileName) {
     world_->InsertModelFile(fileName);
   }
@@ -183,7 +239,20 @@ PYBIND11_MODULE(social_bot, m) {
            &Model::SetPose,
            "Set ((x,y,z), (roll, pitch, yaw)) of the agent");
 
-  py::class_<Agent, Model>(m, "Agent")
+  py::class_<CameraObservation>(m, "CameraObservation", py::buffer_protocol())
+      .def_buffer([](CameraObservation& m) -> py::buffer_info {
+        return py::buffer_info(m.data(),
+                               sizeof(uint8_t),
+                               py::format_descriptor<uint8_t>::format(),
+                               3,
+                               {m.height(), m.width(), m.depth()},
+                               // memory layout for image
+                               {sizeof(uint8_t) * m.width() * m.depth(),
+                                sizeof(uint8_t) * m.depth(),
+                                sizeof(uint8_t)});
+      });
+
+  py::class_<Agent>(m, "Agent")
       .def("get_joint_names",
            &Agent::GetJointNames,
            "Get the names of all the joints of this agent")
@@ -193,6 +262,9 @@ PYBIND11_MODULE(social_bot, m) {
            "to force."
            " Return false if some joint name cannot be found",
            py::arg("forces"));
+      .def("get_camera_observation",
+           &Agent::GetCameraObservation,
+           py::arg("sensorName") = "camera");
 }
 
 }  // namespace social_bot
