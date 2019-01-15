@@ -2,7 +2,6 @@
 
 import random
 import social_bot as bot
-import random
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -66,7 +65,7 @@ for i in range(10000000):
     agent.set_pose(((5, random.random() * 5, 0), (0, 0, 0)))
     print(pose)
 
-    if i % 10 == 0:
+    if i % 10 == 1:
         obs = agent.get_camera_observation("camera")
         npdata = np.array(obs, copy=False)
         plt.imshow(npdata)
