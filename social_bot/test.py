@@ -47,6 +47,9 @@ for idx in range(10):
 agent = world.get_agent()
 agent.get_joint_names()
 
+world.info()
+
+
 for i in range(10000000):
     # observation = agent.sense()
     # add reward and text to observation
@@ -56,7 +59,7 @@ for i in range(10000000):
         "pioneer2dx::pioneer2dx::right_wheel_hinge":
         random.random() * 0.1,
         "pioneer2dx::pioneer2dx::left_wheel_hinge":
-        random.random() * 0.1
+        random.random() * 0.2
     })
     len = random.randint(100, 500)
     for i in range(len):
@@ -66,7 +69,8 @@ for i in range(10000000):
     print(pose)
 
     if i % 10 == 1:
-        obs = agent.get_camera_observation("camera")
+        obs = agent.get_camera_observation(
+            "default::pioneer2dx::camera::link::camera")
         npdata = np.array(obs, copy=False)
         plt.imshow(npdata)
         plt.show()
