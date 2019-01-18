@@ -22,6 +22,19 @@ class Task(object):
     def run(self):
         """
         run() use yield to generate TeacherAction
+        Structure of run():
+
+        def run(self, agent, world):
+          ...
+          # agent_sentence is provided by Teacher using send() in TaskGroup.run_stage()
+          agent_sentence = yield  # the first yielded value is ignored
+          ...
+          # TeacherAction will be passed to Teacher as the return value of send() in TaskGroup.run_stage()
+          agent_sentence = yield TeacherAction(...)
+          ...
+          agent_sentence = yield TeacherAction(...)
+          ...
+          yield TeacherAction(done=True)
         """
         pass
 
@@ -38,15 +51,19 @@ class TaskGroup(object):
         Add a task to the group
         Arguments:
             task: an instance of Task
-
         """
         self._tasks.append(task)
 
     def run_stage(self, agent_sentence):
         task = self._get_current_task()
         try:
+            # teacher_action is the value yielded in task
             teacher_action = task.send(agent_sentence)
             self._is_idle = teacher_action.is_idle
+            if teacher_action.done:
+                task.close()
+                self._current_task = None
+                self._is_idle = True
         except StopIteration:
             self._current_task = None
             self._is_idle = True
@@ -68,6 +85,7 @@ class TaskGroup(object):
         if self._current_task is None:
             tid = random.randint(0, len(self._tasks) - 1)
             self._current_task = self._tasks[tid].run(self._agent, self._world)
+            # run() will execute until the first yield. We ignore the first yielded value.
             self._current_task.send(None)
         return self._current_task
 

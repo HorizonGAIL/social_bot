@@ -45,7 +45,6 @@ class SimpleNavigation(gym.Env):
     In this environment, the agent will receive reward 1 when it is close enough to the goal.
     If it is still not close to the goal after max_steps, it will get reward -1.
     """
-    _joint_names = []
 
     def __init__(self):
         self._world = gazebo.new_world_from_file(
