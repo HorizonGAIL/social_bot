@@ -1,12 +1,14 @@
 # Copyright (c) 2019 Horizon Robotics. All Rights Reserved.
-
-import teacher
-from teacher import TeacherAction
-import random
-import numpy as np
-import social_bot as bot
-import matplotlib.pyplot as plt
+import gym
 import logging
+import numpy as np
+import os
+import random
+
+import social_bot
+from social_bot import teacher
+from social_bot.teacher import TeacherAction
+import social_bot.pygazebo as gazebo
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +40,7 @@ class GoalTask(teacher.Task):
         yield TeacherAction(reward=-1.0, sentence="Failed", done=True)
 
 
-class SimpleGoalEnv(object):
+class SimpleNavigation(gym.Env):
     """
     In this environment, the agent will receive reward 1 when it is close enough to the goal.
     If it is still not close to the goal after max_steps, it will get reward -1.
@@ -46,8 +48,9 @@ class SimpleGoalEnv(object):
     _joint_names = []
 
     def __init__(self):
-        self._world = bot.new_world_from_file(
-            "../../worlds/pioneer2dx_camera.world")
+        self._world = gazebo.new_world_from_file(
+            os.path.join(social_bot.get_world_dir(),
+                         "pioneer2dx_camera.world"))
         self._agent = self._world.get_agent()
         logger.info("joint names: %s" % self._agent.get_joint_names())
         self._joint_names = self._agent.get_joint_names()
@@ -90,7 +93,7 @@ class SimpleGoalEnv(object):
 
 
 def main():
-    env = SimpleGoalEnv()
+    env = SimpleNavigation()
     for _ in range(10000000):
         obs = env.reset()
         control = [random.random() * 0.2, random.random() * 0.2, 0]
@@ -105,5 +108,5 @@ def main():
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
-    bot.initialize()
+    gazebo.initialize()
     main()
