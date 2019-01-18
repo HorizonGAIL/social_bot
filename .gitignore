@@ -1,4 +1,5 @@
 build/*
 Release/*
 Debug/*
+python/*
 *~
