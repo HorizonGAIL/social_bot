@@ -216,8 +216,8 @@ std::unique_ptr<World> NewWorldFromFile(const std::string& world_file) {
 
 std::unique_ptr<World> NewWorld();
 
-PYBIND11_MODULE(social_bot, m) {
-  m.doc() = "social_bot python API";
+PYBIND11_MODULE(pygazebo, m) {
+  m.doc() = "Gazebo python API";
 
   m.def("initialize",
         &Initialize,
