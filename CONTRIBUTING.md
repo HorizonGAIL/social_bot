@@ -2,6 +2,9 @@
 ## Workflow
 
 1. Clone
+```bash
+git clone --recurse-submodules https://github.com/HorizonGAIL/social_bot.git
+```
 
 2. Install code style tools
 ```bash
