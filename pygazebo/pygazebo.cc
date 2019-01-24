@@ -7,6 +7,7 @@
 #include <gazebo/physics/JointController.hh>
 #include <gazebo/physics/Model.hh>
 #include <gazebo/physics/World.hh>
+#include <gazebo/physics/WorldState.hh>
 #include <gazebo/physics/physics.hh>
 #include <gazebo/rendering/Camera.hh>
 #include <gazebo/sensors/CameraSensor.hh>
@@ -35,6 +36,23 @@ class CameraObservation {
  private:
   size_t width_, height_, depth_;
   uint8_t* data_;
+};
+
+class JointState {
+ public:
+  // degree of freedom
+  unsigned int GetDOF() const { return dof_; }
+  const std::vector<double>& GetPositions() const { return positions_; }
+  const std::vector<double>& GetVelocities() const { return velocities_; }
+
+  explicit JointState(unsigned int dof) : dof_(dof) {}
+  void SetVelocities(std::vector<double>& v) { velocities_.swap(v); }
+  void SetPositions(std::vector<double>& pos) { positions_.swap(pos); }
+
+ private:
+  unsigned int dof_;
+  std::vector<double> positions_;
+  std::vector<double> velocities_;
 };
 
 class Action;
@@ -88,6 +106,28 @@ class Agent : public Model {
     return names;
   }
 
+  JointState GetJointState(const std::string& joint_name) {
+    auto joint = model_->GetJoint(joint_name);
+    if (!joint) {
+      std::cerr << "unable to find joint: " << joint_name << std::endl;
+    }
+
+    unsigned int dof = joint->DOF();
+    JointState state(dof);
+    std::vector<double> positions, velocities;
+    positions.reserve(dof);
+    velocities.reserve(dof);
+
+    for (unsigned int i = 0; i < dof; i++) {
+      positions.push_back(joint->Position(i));
+      velocities.push_back(joint->GetVelocity(i));
+    }
+
+    state.SetPositions(positions);
+    state.SetVelocities(velocities);
+    return state;
+  }
+
   CameraObservation GetCameraObservation(const std::string& sensor_scope_name) {
     auto it = cameras_.find(sensor_scope_name);
 
@@ -131,6 +171,7 @@ class Agent : public Model {
       }
     }
   }
+
   void Reset() { model_->Reset(); }
 };
 
@@ -166,12 +207,27 @@ class World {
 
   void Info() const {
     std::cout << " ==== world info ==== " << std::endl;
+    gazebo::physics::WorldState world_state(world_);
+    std::cout << " world state: " << world_state << std::endl;
     for (auto model : world_->Models()) {
       std::cout << "Model: " << model->GetName() << std::endl;
+      for (auto link : model->GetLinks()) {
+        std::cout << "Link: " << link->GetScopedName() << std::endl;
+      }
+
       for (auto joint : model->GetJoints()) {
-        std::cout << "Joint: " << joint->GetScopedName() << std::endl;
+        std::cout << "jJoint: " << joint->GetScopedName() << std::endl;
+        std::cout << "DOF: " << joint->DOF() << std::endl;
+
+        for (int i = 0; i < joint->DOF(); i++) {
+          std::cout << "Position " << i << ":" << joint->Position(i)
+                    << std::endl;
+          std::cout << "Velocity " << i << ":" << joint->GetVelocity(i)
+                    << std::endl;
+        }
       }
     }
+
     gazebo::sensors::SensorManager* mgr =
         gazebo::sensors::SensorManager::Instance();
 
@@ -179,7 +235,8 @@ class World {
       std::cout << " sensor name: " << sensor->Name()
                 << ", scoped name: " << sensor->ScopedName() << std::endl;
     }
-    std::cout << " ======== " << std::endl;
+
+    std::cout << " === the end of world === " << std::endl;
   }
 
   void InsertModelFromSdfString(const std::string& sdfString) {
@@ -187,6 +244,8 @@ class World {
     sdf.SetFromString(sdfString);
     world_->InsertModelSDF(sdf);
   }
+
+  void Reset() { world_->Reset(); }
 };
 
 void Initialize(const std::vector<std::string>& args) {
@@ -244,6 +303,7 @@ PYBIND11_MODULE(pygazebo, m) {
            py::arg("name") = "")
       .def(
           "get_model", &World::GetModel, "Get a model by name", py::arg("name"))
+      .def("reset", &World::Reset, "Reset the world")
       .def("info", &World::Info, "show debug info for the world");
 
   py::class_<Model>(m, "Model")
@@ -253,6 +313,11 @@ PYBIND11_MODULE(pygazebo, m) {
       .def("set_pose",
            &Model::SetPose,
            "Set ((x,y,z), (roll, pitch, yaw)) of the agent");
+
+  py::class_<JointState>(m, "JointState")
+      .def("get_positions", &JointState::GetPositions, "get joint positions")
+      .def("get_velocities", &JointState::GetVelocities, "get joint velocities")
+      .def("get_dof", &JointState::GetDOF, "get degree of freedoms");
 
   py::class_<CameraObservation>(m, "CameraObservation", py::buffer_protocol())
       .def_buffer([](CameraObservation& m) -> py::buffer_info {
@@ -280,6 +345,7 @@ PYBIND11_MODULE(pygazebo, m) {
       .def("get_camera_observation",
            &Agent::GetCameraObservation,
            py::arg("sensor_scope_name"))
+      .def("get_joint_state", &Agent::GetJointState, py::arg("joint_name"))
       .def("reset", &Agent::Reset, "Reset to the initial state");
 }
 
