@@ -46,8 +46,12 @@ class JointState {
   const std::vector<double>& GetVelocities() const { return velocities_; }
 
   explicit JointState(unsigned int dof) : dof_(dof) {}
-  void SetVelocities(std::vector<double>& v) { velocities_.swap(v); }
-  void SetPositions(std::vector<double>& pos) { positions_.swap(pos); }
+  void SetVelocities(const std::vector<double>& v) {
+    velocities_.assign(v.begin(), v.end());
+  }
+  void SetPositions(const std::vector<double>& pos) {
+    positions_.assign(pos.begin(), pos.end());
+  }
 
  private:
   unsigned int dof_;

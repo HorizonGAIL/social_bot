@@ -18,19 +18,43 @@ logger = logging.getLogger(__name__)
 class CartPole(gym.Env):
     """
     This environment simulates the classic cartpole in the pygazebo environment.
+
+    Observation:
+        Type: Box(4)
+        Num	Observation                 Min         Max
+        0	Cart Position              -10.0          10.0
+        1	Cart Velocity              -Inf           Inf
+        2	Pole Angle                 -36°           36°
+        3	Pole Velocity At Joint     -Inf           Inf
+
+    Actions:
+        Type:   Box(1)
+        Representing force acting on the cart.
+
+    Reward:
+        Reward is 1 for every step taken, including the termination step
+
+    Starting State:
+        Pole Angle will be set to small angle between +/- noise radian
+
+    Episode Termination:
+        Pole Angle is more than ±18°
+        Cart Position is more than ±5
+
+    Enviroment Settings:
+        x_threshold:      terminational position for cart
+        theta_threshold:  terminational angles for the pole
+        noise:            noise levels added into observation and
+                          initial postion
+
     """
 
-    def __init__(self,
-                 max_steps=100,
-                 x_threshold=5,
-                 theta_threshold=0.314,
-                 noise=0.001):
+    def __init__(self, x_threshold=5, theta_threshold=0.314, noise=0.001):
         self._world = gazebo.new_world_from_file(
             os.path.join(social_bot.get_world_dir(), "cartpole.world"))
 
         self._agent = self._world.get_agent()
         logger.info("joint names: %s" % self._agent.get_joint_names())
-        self._max_steps = max_steps
         self._x_threshold = x_threshold
         self._theta_threshold = theta_threshold
         high = np.array([

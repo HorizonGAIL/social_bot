@@ -15,12 +15,13 @@ def ppo2():
       .split(' '))
 
 
-"""
-    cross entropy model for policy search.
-"""
-
-
 def cem(num_timesteps=200, n_samples=400, top_frac=0.2, smooth_alpha=0.9):
+    """
+    cross entropy model for policy search.
+    https://www.aaai.org/Papers/ICML/2003/ICML03-068.pdf
+    https://people.smp.uq.edu.au/DirkKroese/ps/CEopt.pdf
+    """
+
     env = gym.make('SocialBot-CartPole-v0')
 
     def actions(obs, theta):
