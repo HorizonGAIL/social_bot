@@ -20,7 +20,11 @@ class CartPole(gym.Env):
     This environment simulates the classic cartpole in the pygazebo environment.
     """
 
-    def __init__(self, max_steps=100, x_threshold=2.4, theta_threshold=0.314):
+    def __init__(self,
+                 max_steps=100,
+                 x_threshold=5,
+                 theta_threshold=0.314,
+                 noise=0.001):
         self._world = gazebo.new_world_from_file(
             os.path.join(social_bot.get_world_dir(), "cartpole.world"))
 
@@ -34,41 +38,47 @@ class CartPole(gym.Env):
             np.finfo(np.float32).max, self._theta_threshold * 2,
             np.finfo(np.float32).max
         ])
-
-        self.action_space = spaces.Box(-20., 20., shape=(1, ), dtype='float32')
+        self.noise = noise
+        self.action_space = spaces.Box(-1, 1, shape=(1, ), dtype='float32')
         self.observation_space = spaces.Box(-high, high, dtype=np.float32)
         self._world.info()
 
     def _get_state(self):
-        s1 = self._agent.get_joint_state("cartpole::cartopole::slider_to_cart")
-        s2 = self._agent.get_joint_state("cartpole::cartopole::cart_to_pole")
+        s1 = self._agent.get_joint_state("cartpole::cartpole::slider_to_cart")
+        s2 = self._agent.get_joint_state("cartpole::cartpole::cart_to_pole")
 
         x, x_dot = s1.get_positions()[0], s1.get_velocities()[0]
         theta, theta_dot = s2.get_positions()[0], s2.get_velocities()[0]
-        state = [x, x_dot, theta, theta_dot]
-        logger.info("state: %f, %f, %f, %f" % tuple(state))
+        state = np.array([x, x_dot, theta, theta_dot])
+        state += np.random.normal(0, self.noise, len(state))
         return state
 
     def step(self, action):
         """
           action is a single float number representing the force
           acting upon the cart
+
+          observation is (cart position, cart speed, pole angle, pole angular veolocity)
         """
         self._world.step(20)
         state = self._get_state()
-        self._agent.take_action({
-            "cartpole::cartopole::slider_to_cart": action
-        })
+        self._agent.take_action({"cartpole::cartpole::slider_to_cart": action})
         done = math.fabs(state[0]) > self._x_threshold or math.fabs(
             state[2]) > self._theta_threshold
         return state, 1.0, done, {}
 
-    """
-    Set cartpole states back to original
-    """
-
     def reset(self):
+        """
+        Set cartpole states back to original, and also add random perturbation
+        """
         self._world.reset()
+
+        joint_state = gazebo.JointState(1)
+        joint_state.set_positions([self.noise * random.random()])
+        joint_state.set_velocities([0.0])
+
+        self._agent.set_joint_state("cartpole::cartpole::cart_to_pole",
+                                    joint_state)
         return self._get_state()
 
 
@@ -77,9 +87,13 @@ def main():
     for _ in range(100):
         print("reset")
         env.reset()
+        env._world.info()
+        total_rewards = 0
         while True:
-            obs, reward, done, info = env.step(random.random() * 10)
+            obs, reward, done, info = env.step((random.random() - 0.5) * 0.5)
+            total_rewards += reward
             if done:
+                print("total reward " + str(total_rewards))
                 break
 
 

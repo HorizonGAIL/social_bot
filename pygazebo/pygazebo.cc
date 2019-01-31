@@ -128,6 +128,23 @@ class Agent : public Model {
     return state;
   }
 
+  void SetJointState(const std::string& joint_name,
+                     const JointState& joint_state) {
+    auto joint = model_->GetJoint(joint_name);
+    if (!joint) {
+      std::cerr << "unable to find joint: " << joint_name << std::endl;
+    }
+
+    if (joint->DOF() != joint_state.GetDOF()) {
+      std::cerr << "joint degree of freedom not match" << std::endl;
+    }
+
+    for (int idx = 0; idx < joint->DOF(); idx++) {
+      joint->SetPosition(idx, joint_state.GetPositions()[idx]);
+      joint->SetVelocity(idx, joint_state.GetVelocities()[idx]);
+    }
+  }
+
   CameraObservation GetCameraObservation(const std::string& sensor_scope_name) {
     auto it = cameras_.find(sensor_scope_name);
 
@@ -216,7 +233,7 @@ class World {
       }
 
       for (auto joint : model->GetJoints()) {
-        std::cout << "jJoint: " << joint->GetScopedName() << std::endl;
+        std::cout << "Joint: " << joint->GetScopedName() << std::endl;
         std::cout << "DOF: " << joint->DOF() << std::endl;
 
         for (int i = 0; i < joint->DOF(); i++) {
@@ -315,8 +332,17 @@ PYBIND11_MODULE(pygazebo, m) {
            "Set ((x,y,z), (roll, pitch, yaw)) of the agent");
 
   py::class_<JointState>(m, "JointState")
+      .def(py::init<unsigned int>())
       .def("get_positions", &JointState::GetPositions, "get joint positions")
       .def("get_velocities", &JointState::GetVelocities, "get joint velocities")
+      .def("set_positions",
+           &JointState::SetPositions,
+           "set joint positions",
+           py::arg("pos"))
+      .def("set_velocities",
+           &JointState::SetVelocities,
+           "set joint velocities",
+           py::arg("v"))
       .def("get_dof", &JointState::GetDOF, "get degree of freedoms");
 
   py::class_<CameraObservation>(m, "CameraObservation", py::buffer_protocol())
@@ -346,6 +372,10 @@ PYBIND11_MODULE(pygazebo, m) {
            &Agent::GetCameraObservation,
            py::arg("sensor_scope_name"))
       .def("get_joint_state", &Agent::GetJointState, py::arg("joint_name"))
+      .def("set_joint_state",
+           &Agent::SetJointState,
+           py::arg("joint_name"),
+           py::arg("joint_state"))
       .def("reset", &Agent::Reset, "Reset to the initial state");
 }
 

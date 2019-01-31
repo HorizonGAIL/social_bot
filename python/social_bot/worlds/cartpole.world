@@ -15,7 +15,7 @@
       <uri>model://sun</uri>
     </include>
 
-    <!-- Pioneer2dx model -->
+    <!-- cartpole model -->
     <model name="cartpole">
       <include>
         <uri>model://cartpole</uri>

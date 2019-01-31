@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<robot name="cartopole" xmlns:xacro="http://ros.org/wiki/xacro">
+<robot name="cartpole" xmlns:xacro="http://ros.org/wiki/xacro">
 
   <link name="world"/>
 
