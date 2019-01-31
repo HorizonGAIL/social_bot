@@ -4,6 +4,7 @@ import gym
 import random
 import social_bot
 import logging
+import matplotlib.pyplot as plt
 
 
 def main():
@@ -14,6 +15,8 @@ def main():
         while True:
             obs, reward, done, info = env.step(
                 dict(control=control, sentence="hello"))
+            plt.imshow(obs["image"])
+            plt.pause(0.001)
             if done:
                 logging.info("reward: " + str(reward) + "sent: " +
                              str(obs["sentence"]))
@@ -21,5 +24,5 @@ def main():
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.INFO)
     main()

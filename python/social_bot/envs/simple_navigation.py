@@ -1,5 +1,7 @@
 # Copyright (c) 2019 Horizon Robotics. All Rights Reserved.
+from collections import OrderedDict
 import gym
+import gym.spaces
 import logging
 import numpy as np
 import os
@@ -29,15 +31,24 @@ class GoalTask(teacher.Task):
             goal_loc = np.array(goal_loc)
             dist = np.linalg.norm(loc - goal_loc)
             if dist < self._distance_thresh:
-                logger.info("loc: " + str(loc) + " goal: " + str(goal_loc) +
-                            "dist: " + str(dist))
+                logger.debug("loc: " + str(loc) + " goal: " + str(goal_loc) +
+                             "dist: " + str(dist))
                 agent_sentence = yield TeacherAction(
                     reward=1.0, sentence="Well done!", done=True)
             else:
                 agent_sentence = yield TeacherAction()
-        logger.info("loc: " + str(loc) + " goal: " + str(goal_loc) + "dist: " +
-                    str(dist))
+        logger.debug("loc: " + str(loc) + " goal: " + str(goal_loc) +
+                     "dist: " + str(dist))
         yield TeacherAction(reward=-1.0, sentence="Failed", done=True)
+
+
+class DiscreteSequence(gym.Space):
+    def __init__(self, vocab_size, max_length):
+        super()
+        self._vocab_size = vocab_size
+        self._max_length = max_length
+        self.dtype = np.int32
+        self.shape = (max_length)
 
 
 class SimpleNavigation(gym.Env):
@@ -46,7 +57,7 @@ class SimpleNavigation(gym.Env):
     If it is still not close to the goal after max_steps, it will get reward -1.
     """
 
-    def __init__(self):
+    def __init__(self, with_language=True):
         self._world = gazebo.new_world_from_file(
             os.path.join(social_bot.get_world_dir(),
                          "pioneer2dx_camera.world"))
@@ -57,6 +68,44 @@ class SimpleNavigation(gym.Env):
         task_group = teacher.TaskGroup()
         task_group.add_task(GoalTask())
         self._teacher.add_task_group(task_group)
+        self._with_language = with_language
+
+        # get observation dimension
+        image = self._agent.get_camera_observation("camera")
+        image = np.array(image, copy=False)
+        if with_language:
+            self._observation_space = gym.spaces.Dict(
+                image=gym.spaces.Box(
+                    low=0, high=1, shape=image.shape, dtype=np.uint8),
+                sentence=DiscreteSequence(256, 20))
+
+            self._action_space = gym.spaces.Dict(
+                control=gym.spaces.Box(
+                    low=-0.2,
+                    high=0.2,
+                    shape=[len(self._joint_names)],
+                    dtype=np.float32),
+                sentence=DiscreteSequence(256, 20))
+        else:
+            self._observation_space = image = gym.spaces.Box(
+                low=0, high=1, shape=image.shape, dtype=np.uint8)
+            self._action_space = gym.spaces.Box(
+                low=-0.2,
+                high=0.2,
+                shape=[len(self._joint_names)],
+                dtype=np.float32)
+
+    @property
+    def observation_space(self):
+        return self._observation_space
+
+    @property
+    def action_space(self):
+        return self._action_space
+
+    @property
+    def reward_range(self):
+        return -1., 1.
 
     def step(self, action):
         """
@@ -65,16 +114,23 @@ class SimpleNavigation(gym.Env):
                     action['control'] is a vector whose dimention is
                     len(_joint_names). action['sentence'] is a string
         """
-        sentence = action.get('sentence', None)
+        if self._with_language:
+            sentence = action.get('sentence', None)
+            controls = action['control']
+        else:
+            sentence = ''
+            controls = action
+        controls = dict(zip(self._joint_names, controls))
         teacher_action = self._teacher.teach(sentence)
-        controls = dict(zip(self._joint_names, action['control']))
         self._agent.take_action(controls)
         self._world.step(100)
         image = self._agent.get_camera_observation("camera")
         image = np.array(image, copy=False)
-        return dict(
-            image=image, sentence=teacher_action.
-            sentence), teacher_action.reward, teacher_action.done, None
+        if self._with_language:
+            obs = OrderedDict(image=image, sentence=teacher_action.sentence)
+        else:
+            obs = image
+        return (obs, teacher_action.reward, teacher_action.done, {})
 
     def reset(self):
         self._new_world()
@@ -82,13 +138,25 @@ class SimpleNavigation(gym.Env):
         teacher_action = self._teacher.teach("")
         image = self._agent.get_camera_observation("camera")
         image = np.array(image, copy=False)
-        return dict(image=image, sentence=teacher_action.sentence)
+        if self._with_language:
+            obs = OrderedDict(image=image, sentence=teacher_action.sentence)
+        else:
+            obs = image
+        return obs
 
     def _new_world(self):
         goal = self._world.get_model("goal")
-        loc = (random.random() * 4 - 2, random.random() * 4 - 2, 0)
+        while True:
+            loc = (random.random() * 4 - 2, random.random() * 4 - 2, 0)
+            if np.linalg.norm(loc) > 0.5:
+                break
         goal.set_pose((loc, (0, 0, 0)))
         self._agent.reset()
+
+
+class SimpleNavigationNoLanguage(SimpleNavigation):
+    def __init__(self):
+        super(SimpleNavigationNoLanguage, self).__init__(with_language=False)
 
 
 def main():
