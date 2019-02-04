@@ -27,8 +27,15 @@ class ReplayBuffer(object):
     def get_experience(self, index):
         return self._buffer[index]
 
+    @property
+    def initial_priority(self):
+        return 1.0
+
     def __getitem__(self, index):
         return self._buffer[index]
+
+    def __setitem__(self, index, e):
+        self._buffer[index] = e
 
     def __len__(self):
         """Return the current size of internal memory."""
@@ -79,7 +86,7 @@ class ReplayBuffer(object):
             if self._do_not_sample_flags[idx]:
                 continue
             indices.append(idx)
-            is_weights.append(is_weight)
+            is_weights.append(weight)
 
         return indices, is_weights
 
@@ -115,7 +122,8 @@ class ReplayBuffer(object):
         for i, batch_feature in enumerate(batch_features):
             batch_features[i] = np.vstack(batch_feature)
 
-        return batch_features, indices, np.vstack(is_weights)
+        return batch_features, indices, np.vstack(is_weights).astype(
+            np.float32)
 
     def _add_sample(self, priority=None):
         """
@@ -144,6 +152,14 @@ class PrioritizedReplayBuffer(ReplayBuffer):
             self._min_tree[i] = 1.0
         self._current_idx = 0
         self._max_priority = 1.0
+
+    @property
+    def initial_priority(self):
+        return self._max_priority
+
+    def get_priority(self, idx):
+        idx = self._buffer_idx_to_tree_idx(idx)
+        return self._sum_tree[idx]
 
     def update_priority(self, indices, priorities):
         for idx, priority in zip(indices, priorities):

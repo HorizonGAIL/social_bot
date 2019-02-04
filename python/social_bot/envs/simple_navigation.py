@@ -3,6 +3,7 @@ from collections import OrderedDict
 import gym
 import gym.spaces
 import logging
+import math
 import numpy as np
 import os
 import random
@@ -16,9 +17,14 @@ logger = logging.getLogger(__name__)
 
 
 class GoalTask(teacher.Task):
-    def __init__(self, max_steps=100, goal_name="goal", distance_thresh=0.5):
+    def __init__(self,
+                 max_steps=100,
+                 goal_name="goal",
+                 sucess_distance_thresh=0.5,
+                 fail_distance_thresh=3):
         self._goal_name = goal_name
-        self._distance_thresh = distance_thresh
+        self._success_distance_thresh = sucess_distance_thresh
+        self._fail_distance_thresh = fail_distance_thresh
         self._max_steps = max_steps
 
     def run(self, agent, world):
@@ -30,11 +36,23 @@ class GoalTask(teacher.Task):
             loc = np.array(loc)
             goal_loc = np.array(goal_loc)
             dist = np.linalg.norm(loc - goal_loc)
-            if dist < self._distance_thresh:
+            if dist < self._success_distance_thresh:
+                # dir from get_pose is (roll, pitch, roll)
+                dir = np.array([math.cos(dir[2]), math.sin(dir[2])])
+                goal_dir = (goal_loc[0:2] - loc[0:2]) / dist
+                dot = sum(dir * goal_dir)
+                if dot > 0.707:
+                    # within 45 degrees of the agent direction
+                    logger.debug("loc: " + str(loc) + " goal: " +
+                                 str(goal_loc) + "dist: " + str(dist))
+                    agent_sentence = yield TeacherAction(
+                        reward=1.0, sentence="Well done!", done=True)
+                else:
+                    agent_sentence = yield TeacherAction()
+            elif dist > self._fail_distance_thresh:
                 logger.debug("loc: " + str(loc) + " goal: " + str(goal_loc) +
                              "dist: " + str(dist))
-                agent_sentence = yield TeacherAction(
-                    reward=1.0, sentence="Well done!", done=True)
+                yield TeacherAction(reward=-1.0, sentence="Failed", done=True)
             else:
                 agent_sentence = yield TeacherAction()
         logger.debug("loc: " + str(loc) + " goal: " + str(goal_loc) +
@@ -147,7 +165,7 @@ class SimpleNavigation(gym.Env):
     def _new_world(self):
         goal = self._world.get_model("goal")
         while True:
-            loc = (random.random() * 4 - 2, random.random() * 4 - 2, 0)
+            loc = (random.random() * 2 - 1, random.random() * 2 - 1, 0)
             if np.linalg.norm(loc) > 0.5:
                 break
         goal.set_pose((loc, (0, 0, 0)))
