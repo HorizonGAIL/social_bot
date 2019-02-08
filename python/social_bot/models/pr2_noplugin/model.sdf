@@ -1,0 +1,292 @@
+<model name='pr2'>
+<pose frame=''>0.298258 -0.688844 -0.004439 1.1e-05 -7e-05 -0.009241</pose>
+<scale>1 1 1</scale>
+<link name='base_footprint'>
+<pose frame=''>0.298258 -0.688844 -0.004439 1.1e-05 -7e-05 -0.009241</pose>
+<velocity>0.000258 0.000987 -0.003817 4.9e-05 -0.000354 -0.00152</velocity>
+<acceleration>0.044857 -0.061767 -7.85459 0.091718 -0.646183 0.096516</acceleration>
+<wrench>5.29322 -7.28857 -926.849 0 -0 0</wrench>
+</link>
+<link name='bl_caster_l_wheel_link'>
+<pose frame=''>0.084086 -0.413903 0.074782 5.4e-05 0.186774 -0.171216</pose>
+<velocity>0.003607 0.00284 -0.012196 0.00202 0.056909 -0.058471</velocity>
+<acceleration>0.487821 3.96093 -24.6518 0.200674 0.727544 -2.63257</acceleration>
+<wrench>0.214817 1.74423 -10.8557 0 -0 0</wrench>
+</link>
+<link name='bl_caster_r_wheel_link'>
+<pose frame=''>0.067389 -0.510465 0.074784 -2e-05 -0.038319 -0.171222</pose>
+<velocity>-0.002319 0.002485 -0.013078 0.006966 -0.022383 -0.059267</velocity>
+<acceleration>-0.010279 1.27109 -26.4488 1.84009 0.953591 -0.950985</acceleration>
+<wrench>-0.004526 0.559735 -11.647 0 -0 0</wrench>
+</link>
+<link name='bl_caster_rotation_link'>
+<pose frame=''>0.075738 -0.462179 0.074756 4.7e-05 -6.8e-05 -0.171225</pose>
+<velocity>0.000568 0.001432 -0.005749 -0.006049 0.000737 -0.058661</velocity>
+<acceleration>0.19619 1.00785 -11.6896 -2.98273 1.20705 -2.80888</acceleration>
+<wrench>0.681383 3.50034 -40.5991 0 -0 0</wrench>
+</link>
+<link name='br_caster_l_wheel_link'>
+<pose frame=''>0.078407 -0.862845 0.074782 5.8e-05 0.107673 -0.139633</pose>
+<velocity>0.002721 0.002998 -0.013265 -0.002934 0.047285 -0.056432</velocity>
+<acceleration>0.285081 4.05481 -26.7791 2.83774 0.88655 -2.34115</acceleration>
+<wrench>0.125538 1.78557 -11.7924 0 -0 0</wrench>
+</link>
+<link name='br_caster_r_wheel_link'>
+<pose frame=''>0.064768 -0.959885 0.074783 -2.6e-05 -0.068626 -0.139634</pose>
+<velocity>-0.003046 0.002245 -0.014156 0.007745 -0.027253 -0.057348</velocity>
+<acceleration>-0.2125 0.983809 -28.5879 1.37208 -0.388136 2.1268</acceleration>
+<wrench>-0.093576 0.43323 -12.589 0 -0 0</wrench>
+</link>
+<link name='br_caster_rotation_link'>
+<pose frame=''>0.071587 -0.91136 0.074752 4.9e-05 -6.9e-05 -0.139639</pose>
+<velocity>-0.000172 0.001362 -0.005971 -0.007232 0.000941 -0.05669</velocity>
+<acceleration>0.153979 1.02017 -12.1272 0.929247 0.819955 -2.72396</acceleration>
+<wrench>0.534781 3.54313 -42.1186 0 -0 0</wrench>
+</link>
+<link name='fl_caster_l_wheel_link'>
+<pose frame=''>0.523636 -0.417349 0.074787 9e-06 0.02486 0.026197</pose>
+<velocity>0.000167 0.001297 -0.005494 -0.000427 0.004713 0.004675</velocity>
+<acceleration>-0.262286 1.31495 -11.2834 -0.815423 -0.064242 0.18887</acceleration>
+<wrench>-0.1155 0.57905 -4.96875 0 -0 0</wrench>
+</link>
+<link name='fl_caster_r_wheel_link'>
+<pose frame=''>0.526203 -0.515314 0.074787 -6e-06 0.061074 0.026198</pose>
+<velocity>0.000601 0.001018 -0.005756 0.003294 0.011337 0.004407</velocity>
+<acceleration>-0.283693 0.711508 -11.8685 0.922862 0.564089 -0.318545</acceleration>
+<wrench>-0.124927 0.31332 -5.22642 0 -0 0</wrench>
+</link>
+<link name='fl_caster_rotation_link'>
+<pose frame=''>0.524919 -0.46633 0.074781 1e-05 -7.3e-05 0.026197</pose>
+<velocity>0.000513 0.000699 -0.004101 -0.000478 0.000266 0.004584</velocity>
+<acceleration>0.033649 0.171905 -8.42514 -1.10987 0.576548 0.016523</acceleration>
+<wrench>0.116866 0.59704 -29.2612 0 -0 0</wrench>
+</link>
+<link name='fr_caster_l_wheel_link'>
+<pose frame=''>0.522842 -0.866557 0.074786 2e-05 0.025715 -0.042342</pose>
+<velocity>-0.000105 0.001425 -0.006465 -0.001651 0.00083 -0.002691</velocity>
+<acceleration>-0.114284 1.55856 -13.2185 2.69991 0.011966 0.29934</acceleration>
+<wrench>-0.050326 0.686329 -5.8209 0 -0 0</wrench>
+</link>
+<link name='fr_caster_r_wheel_link'>
+<pose frame=''>0.518694 -0.964468 0.074787 -4e-06 -0.026723 -0.042341</pose>
+<velocity>-0.000424 0.000984 -0.006883 0.00433 -0.002328 -0.003029</velocity>
+<acceleration>-0.198391 0.63294 -14.1087 2.71873 -0.032264 -0.414344</acceleration>
+<wrench>-0.087363 0.278721 -6.2129 0 -0 0</wrench>
+</link>
+<link name='fr_caster_rotation_link'>
+<pose frame=''>0.520768 -0.91551 0.074777 1.9e-05 -7.2e-05 -0.042342</pose>
+<velocity>-0.00016 0.000691 -0.004324 -0.001409 0.000265 -0.002799</velocity>
+<acceleration>0.096711 0.272645 -8.86604 -2.981 0.592444 0.065018</acceleration>
+<wrench>0.335884 0.946917 -30.7925 0 -0 0</wrench>
+</link>
+<link name='head_pan_link'>
+<pose frame=''>0.231108 -0.688236 1.16769 1.4e-05 -7e-05 -0.008909</pose>
+<velocity>6.9e-05 0.001086 -0.002136 -0.000907 -0.000424 -0.002253</velocity>
+<acceleration>-0.187952 0.119417 -5.78168 -1.82466 -0.755139 -0.265727</acceleration>
+<wrench>-1.19143 0.756984 -36.6501 0 -0 0</wrench>
+</link>
+<link name='head_tilt_link'>
+<pose frame=''>0.299106 -0.688842 1.16769 1.5e-05 -0.471309 -0.008915</pose>
+<velocity>5.8e-05 0.001019 -0.00213 -0.000752 -0.000106 -0.002289</velocity>
+<acceleration>-0.236799 0.220757 -5.75864 -1.61723 -1.33445 -0.53154</acceleration>
+<wrench>-1.25954 1.17421 -30.6302 0 -0 0</wrench>
+</link>
+<link name='l_elbow_flex_link'>
+<pose frame=''>0.749921 -0.504997 0.786049 0.00022 -0.085347 -0.009218</pose>
+<velocity>0.000462 0.000267 0.000439 0.001746 0.001496 -0.001668</velocity>
+<acceleration>0.006163 0.017023 1.06757 1.94246 -0.722449 2.99664</acceleration>
+<wrench>0.011731 0.0324 2.03187 0 -0 0</wrench>
+</link>
+<link name='l_forearm_roll_link'>
+<pose frame=''>0.74992 -0.504997 0.786049 0.000493 -0.085347 -0.009219</pose>
+<velocity>0.000485 0.000279 0.000417 5.7e-05 0.001525 -0.001484</velocity>
+<acceleration>0.122676 0.001116 0.352332 -3.09922 -0.804201 -3.06014</acceleration>
+<wrench>0.32996 0.003002 0.94766 0 -0 0</wrench>
+</link>
+<link name='l_gripper_l_finger_link'>
+<pose frame=''>1.14315 -0.49863 0.836615 0.000584 -0.306393 -0.009313</pose>
+<velocity>0.00056 -0.0003 -0 3.2e-05 -0.000694 -0.001649</velocity>
+<acceleration>0.246924 0.020035 -0.035 -0.026687 -1.12433 -0.26311</acceleration>
+<wrench>0.042288 0.003431 -0.005994 0 -0 0</wrench>
+</link>
+<link name='l_gripper_l_finger_tip_link'>
+<pose frame=''>1.23031 -0.494492 0.864177 0.000591 -0.306393 -0.009332</pose>
+<velocity>0.000545 -0.000444 6e-05 -0.000252 -0.000547 -0.001566</velocity>
+<acceleration>0.218317 0.008636 0.024718 -0.492668 -0.8636 -0.044953</acceleration>
+<wrench>0.009647 0.000382 0.001092 0 -0 0</wrench>
+</link>
+<link name='l_gripper_l_parallel_link'>
+<pose frame=''>1.12619 -0.477471 0.831198 0.000584 -0.306393 -0.009312</pose>
+<velocity>0.00059 -0.000275 -1.4e-05 6.6e-05 -0.000679 -0.001753</velocity>
+<acceleration>0.245934 0.011823 -0.059542 0.055233 -1.09536 -0.44936</acceleration>
+<wrench>0.042119 0.002025 -0.010197 0 -0 0</wrench>
+</link>
+<link name='l_gripper_motor_screw_link'>
+<pose frame=''>1.23017 -0.509443 0.864169 0.000589 -0.301249 -0.009329</pose>
+<velocity>0.00053 -0.000427 6.2e-05 -1.7e-05 -0.002077 -0.001489</velocity>
+<acceleration>0.233877 0.040395 0.026559 -0.026493 0.112239 0.069772</acceleration>
+<wrench>0.002339 0.000404 0.000266 0 -0 0</wrench>
+</link>
+<link name='l_gripper_motor_slider_link'>
+<pose frame=''>1.23017 -0.509443 0.864169 0.00059 -0.306393 -0.009332</pose>
+<velocity>0.000527 -0.000426 6.1e-05 -6e-06 -0.000698 -0.001479</velocity>
+<acceleration>0.228204 0.039817 0.024476 -0.040625 -1.13422 0.086523</acceleration>
+<wrench>0.002282 0.000398 0.000245 0 -0 0</wrench>
+</link>
+<link name='l_gripper_r_finger_link'>
+<pose frame=''>1.14297 -0.51863 0.836604 0.000596 -0.306393 -0.009351</pose>
+<velocity>0.000527 -0.000297 -2e-06 1.7e-05 -0.000694 -0.001528</velocity>
+<acceleration>0.236909 0.033287 -0.039092 0.007484 -1.12635 -0.064139</acceleration>
+<wrench>0.041196 0.005788 -0.006798 0 -0 0</wrench>
+</link>
+<link name='l_gripper_r_finger_tip_link'>
+<pose frame=''>1.23004 -0.524394 0.86416 0.00059 -0.306393 -0.009332</pose>
+<velocity>0.000498 -0.000428 5.7e-05 -2.1e-05 -0.000733 -0.001456</velocity>
+<acceleration>0.214631 0.034298 0.023163 0.015702 -1.14051 0.000191</acceleration>
+<wrench>0.009485 0.001516 0.001024 0 -0 0</wrench>
+</link>
+<link name='l_gripper_r_parallel_link'>
+<pose frame=''>1.12562 -0.539468 0.831163 0.000596 -0.306393 -0.009352</pose>
+<velocity>0.000494 -0.000273 -1.6e-05 -3.1e-05 -0.000692 -0.001372</velocity>
+<acceleration>0.239101 0.038964 -0.060893 0.01817 -1.11954 0.241134</acceleration>
+<wrench>0.041577 0.006775 -0.010589 0 -0 0</wrench>
+</link>
+<link name='l_shoulder_lift_link'>
+<pose frame=''>0.349938 -0.501317 0.786242 1e-05 0.000485 -0.009199</pose>
+<velocity>0.000404 0.00088 -0.002192 0.000152 -0.006987 -0.001602</velocity>
+<acceleration>0.496877 -0.074558 -5.53089 0.278755 0.39869 -0.020163</acceleration>
+<wrench>1.36635 -0.205026 -15.2093 0 -0 0</wrench>
+</link>
+<link name='l_shoulder_pan_link'>
+<pose frame=''>0.249942 -0.500397 0.786235 1e-05 -7.1e-05 -0.009199</pose>
+<velocity>0.000407 0.001019 -0.002283 0.000211 -0.000102 -0.00155</velocity>
+<acceleration>-0.066012 -0.07969 -6.08486 0.418159 -0.104098 0.070399</acceleration>
+<wrench>-1.70307 -2.05595 -156.985 0 -0 0</wrench>
+</link>
+<link name='l_upper_arm_roll_link'>
+<pose frame=''>0.349938 -0.501317 0.786242 0.000219 0.000483 -0.009199</pose>
+<velocity>0.000454 0.000903 -0.002057 0.001645 -0.006353 -0.001612</velocity>
+<acceleration>0.034487 -0.042834 -1.97197 1.97026 1.44153 3.08628</acceleration>
+<wrench>0.210981 -0.262046 -12.0639 0 -0 0</wrench>
+</link>
+<link name='l_wrist_flex_link'>
+<pose frame=''>1.06974 -0.507946 0.813412 0.000515 -0.306393 -0.009332</pose>
+<velocity>0.000529 -0.000194 -6.6e-05 3.1e-05 -0.000747 -0.00147</velocity>
+<acceleration>0.218202 0.016619 -0.188087 0.006347 -1.22898 0.110206</acceleration>
+<wrench>0.13398 0.010204 -0.115489 0 -0 0</wrench>
+</link>
+<link name='l_wrist_roll_link'>
+<pose frame=''>1.06974 -0.507946 0.813412 0.00059 -0.306393 -0.009332</pose>
+<velocity>0.000546 -0.000191 -5.9e-05 -7e-06 -0.000703 -0.001478</velocity>
+<acceleration>0.230878 0.027973 -0.11025 -0.040517 -1.14577 0.090769</acceleration>
+<wrench>0.157244 0.019052 -0.075088 0 -0 0</wrench>
+</link>
+<link name='laser_tilt_mount_link'>
+<pose frame=''>0.347115 -0.689306 1.01324 1.1e-05 -0.159149 -0.009242</pose>
+<velocity>2.4e-05 0.000881 -0.002221 1e-05 -0.000368 -0.001515</velocity>
+<acceleration>-0.217729 -0.090011 -5.91625 0.003253 -0.854301 0.10793</acceleration>
+<wrench>-0.128896 -0.053286 -3.50242 0 -0 0</wrench>
+</link>
+<link name='r_elbow_flex_link'>
+<pose frame=''>0.746446 -0.881009 0.786066 0.000498 -0.084658 -0.009297</pose>
+<velocity>-0.000141 0.000285 0.000494 -0.001687 0.001821 -0.001678</velocity>
+<acceleration>-0.026151 -0.09088 1.16069 -1.69533 -1.45077 2.89365</acceleration>
+<wrench>-0.049772 -0.17297 2.2091 0 -0 0</wrench>
+</link>
+<link name='r_forearm_roll_link'>
+<pose frame=''>0.746446 -0.881009 0.786066 0.000368 -0.084658 -0.009297</pose>
+<velocity>-0.000144 0.000282 0.000498 1.5e-05 0.001777 -0.001507</velocity>
+<acceleration>0.04873 -0.001702 0.411078 -3.12053 -1.3365 -2.9212</acceleration>
+<wrench>0.131067 -0.004578 1.10567 0 -0 0</wrench>
+</link>
+<link name='r_gripper_l_finger_link'>
+<pose frame=''>1.13986 -0.874672 0.835901 0.000458 -0.299444 -0.009359</pose>
+<velocity>-8.7e-05 -0.000322 -1.2e-05 9.7e-05 -0.000742 -0.00201</velocity>
+<acceleration>0.14675 -0.007808 -0.07118 -0.130314 -1.19435 -0.848144</acceleration>
+<wrench>0.025132 -0.001337 -0.01219 0 -0 0</wrench>
+</link>
+<link name='r_gripper_l_finger_tip_link'>
+<pose frame=''>1.22721 -0.87054 0.862856 0.000466 -0.299444 -0.009379</pose>
+<velocity>-0.000103 -0.000497 5.3e-05 -0.000417 -0.000507 -0.001745</velocity>
+<acceleration>0.106472 -0.048539 -0.010023 -0.966347 -0.637268 -0.352943</acceleration>
+<wrench>0.004705 -0.002145 -0.000443 0 -0 0</wrench>
+</link>
+<link name='r_gripper_l_parallel_link'>
+<pose frame=''>1.12285 -0.853512 0.8306 0.000458 -0.299444 -0.009358</pose>
+<velocity>-5.6e-05 -0.000294 -2.9e-05 0.00021 -0.000717 -0.002188</velocity>
+<acceleration>0.146854 -0.021183 -0.098725 0.191818 -1.14941 -1.2164</acceleration>
+<wrench>0.02515 -0.003628 -0.016908 0 -0 0</wrench>
+</link>
+<link name='r_gripper_motor_screw_link'>
+<pose frame=''>1.22707 -0.885491 0.862849 0.000463 -0.294545 -0.009377</pose>
+<velocity>-0.000115 -0.00046 5.5e-05 7e-06 -0.002144 -0.001618</velocity>
+<acceleration>0.128666 0.025691 -0.006872 0.004294 0.083838 -0.036185</acceleration>
+<wrench>0.001287 0.000257 -6.9e-05 0 -0 0</wrench>
+</link>
+<link name='r_gripper_motor_slider_link'>
+<pose frame=''>1.22707 -0.885491 0.862849 0.000464 -0.299444 -0.009379</pose>
+<velocity>-0.000119 -0.000458 5.4e-05 1.9e-05 -0.000742 -0.001601</velocity>
+<acceleration>0.120963 0.026038 -0.008675 -0.01022 -1.19898 -0.003033</acceleration>
+<wrench>0.00121 0.00026 -8.7e-05 0 -0 0</wrench>
+</link>
+<link name='r_gripper_r_finger_link'>
+<pose frame=''>1.13967 -0.894671 0.835892 0.000469 -0.299444 -0.009396</pose>
+<velocity>-0.000122 -0.000317 -1.5e-05 2.5e-05 -0.000742 -0.00162</velocity>
+<acceleration>0.124297 0.027521 -0.080324 -0.009859 -1.19934 -0.126128</acceleration>
+<wrench>0.021614 0.004786 -0.013967 0 -0 0</wrench>
+</link>
+<link name='r_gripper_r_finger_tip_link'>
+<pose frame=''>1.22693 -0.900442 0.862843 0.000463 -0.299444 -0.009376</pose>
+<velocity>-0.000152 -0.000456 4.9e-05 0.000208 -0.00074 -0.002236</velocity>
+<acceleration>0.097767 0.021437 -0.0132 2.6469 -1.19491 1.54167</acceleration>
+<wrench>0.00432 0.000947 -0.000583 0 -0 0</wrench>
+</link>
+<link name='r_gripper_r_parallel_link'>
+<pose frame=''>1.12228 -0.915509 0.830573 0.000469 -0.299444 -0.009396</pose>
+<velocity>-0.000153 -0.000288 -3e-05 1.5e-05 -0.000726 -0.001613</velocity>
+<acceleration>0.128176 0.030482 -0.103865 0.007548 -1.16853 -0.101622</acceleration>
+<wrench>0.022289 0.0053 -0.018061 0 -0 0</wrench>
+</link>
+<link name='r_shoulder_lift_link'>
+<pose frame=''>0.346463 -0.877307 0.786238 1e-05 0.00043 -0.009255</pose>
+<velocity>-0.000147 0.00089 -0.00221 0.000101 -0.006958 -0.001499</velocity>
+<acceleration>0.572859 -0.068585 -5.50342 0.180963 0.629947 0.147549</acceleration>
+<wrench>1.57529 -0.1886 -15.1338 0 -0 0</wrench>
+</link>
+<link name='r_shoulder_pan_link'>
+<pose frame=''>0.246468 -0.876381 0.786231 1.1e-05 -7.1e-05 -0.009255</pose>
+<velocity>-0.000186 0.001028 -0.002271 -9e-06 -0.000268 -0.001466</velocity>
+<acceleration>-0.040973 -0.116026 -6.00469 -0.022565 -0.436256 0.199256</acceleration>
+<wrench>-1.05707 -2.99339 -154.917 0 -0 0</wrench>
+</link>
+<link name='r_upper_arm_roll_link'>
+<pose frame=''>0.346463 -0.877307 0.786238 0.000496 0.00043 -0.009255</pose>
+<velocity>-0.000151 0.000913 -0.002239 -0.001753 -0.006795 -0.001571</velocity>
+<acceleration>-0.002912 -0.034814 -2.11337 1.76228 1.02479 -0.006729</acceleration>
+<wrench>-0.017814 -0.212983 -12.9289 0 -0 0</wrench>
+</link>
+<link name='r_wrist_flex_link'>
+<pose frame=''>1.06628 -0.883983 0.813209 0.000384 -0.299444 -0.009379</pose>
+<velocity>-8.8e-05 -0.000201 -6.8e-05 3.8e-05 -0.000738 -0.001654</velocity>
+<acceleration>0.166949 0.028351 -0.20712 0.089572 -1.19098 -0.097828</acceleration>
+<wrench>0.10251 0.017408 -0.127176 0 -0 0</wrench>
+</link>
+<link name='r_wrist_roll_link'>
+<pose frame=''>1.06628 -0.883983 0.813209 0.000464 -0.299444 -0.009379</pose>
+<velocity>-8.6e-05 -0.000201 -6.8e-05 2e-05 -0.000741 -0.001609</velocity>
+<acceleration>0.149254 0.027232 -0.140753 -0.007782 -1.19798 -0.017905</acceleration>
+<wrench>0.101653 0.018547 -0.095862 0 -0 0</wrench>
+</link>
+<link name='torso_lift_link'>
+<pose frame=''>0.248205 -0.688389 0.786234 1.1e-05 -7.2e-05 -0.009241</pose>
+<velocity>7.3e-05 0.001034 -0.002465 1.5e-05 -1.9e-05 -0.001561</velocity>
+<acceleration>-0.156629 -0.095791 -6.44964 0.024986 0.061848 0.015615</acceleration>
+<wrench>-5.70898 -3.4915 -235.083 0 -0 0</wrench>
+</link>
+<link name='torso_lift_motor_screw_link'>
+<pose frame=''>0.148211 -0.687465 0.746551 1e-05 -7.1e-05 -0.001338</pose>
+<velocity>7.8e-05 0.001191 -0.004224 -7.5e-05 -0.000206 0.133556</velocity>
+<acceleration>-0.127113 -0.09568 -8.07939 -0.141042 -0.37058 -2.33984</acceleration>
+<wrench>-0.127113 -0.09568 -8.07939 0 -0 0</wrench>
+</link>
+</model>
