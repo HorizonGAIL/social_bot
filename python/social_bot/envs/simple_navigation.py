@@ -1,4 +1,7 @@
 # Copyright (c) 2019 Horizon Robotics. All Rights Reserved.
+"""
+A simple enviroment for navigation.
+"""
 from collections import OrderedDict
 import gym
 import gym.spaces
@@ -17,20 +20,46 @@ logger = logging.getLogger(__name__)
 
 
 class GoalTask(teacher.Task):
+    """
+    For this task, the agent will receive reward 1 when it is close enough to the goal.
+    If it is moving away from the goal too much or still not close to the goal after max_steps,
+    it will get reward -1.
+    """
+
     def __init__(self,
-                 max_steps=100,
+                 max_steps=500,
                  goal_name="goal",
-                 sucess_distance_thresh=0.5,
-                 fail_distance_thresh=3):
+                 success_distance_thresh=0.5,
+                 fail_distance_thresh=0.5):
+        """
+        Arguments
+            max_steps(int): episode will end if not reaching gaol in so many steps
+            goal_name(string): name of the goal in the world
+            success_distance_thresh(float): the goal is reached if it's within this distance to the agent
+            fail_distance_thresh(float): if the agent moves away from the goal more than this distance,
+                it's considered a failure and is givne reward -1
+        """
         self._goal_name = goal_name
-        self._success_distance_thresh = sucess_distance_thresh
+        self._success_distance_thresh = success_distance_thresh
         self._fail_distance_thresh = fail_distance_thresh
         self._max_steps = max_steps
 
     def run(self, agent, world):
+        """
+        Start a teaching episode for this task.
+        Arguments
+            agent(pygazebo.Agent): the learning agent 
+            world(pygazebo.World): the simulation world
+        """
         agent_sentence = yield
+        agent.reset()
         goal = world.get_agent(self._goal_name)
-        for step in range(self._max_steps):
+        loc, dir = agent.get_pose()
+        loc = np.array(loc)
+        self._move_goal(goal, loc)
+        steps_since_last_reward = 0
+        while steps_since_last_reward < self._max_steps:
+            steps_since_last_reward += 1
             loc, dir = agent.get_pose()
             goal_loc, _ = goal.get_pose()
             loc = np.array(loc)
@@ -46,10 +75,12 @@ class GoalTask(teacher.Task):
                     logger.debug("loc: " + str(loc) + " goal: " +
                                  str(goal_loc) + "dist: " + str(dist))
                     agent_sentence = yield TeacherAction(
-                        reward=1.0, sentence="Well done!", done=True)
+                        reward=1.0, sentence="Well done!", done=False)
+                    steps_since_last_reward = 0
+                    self._move_goal(goal, loc)
                 else:
                     agent_sentence = yield TeacherAction()
-            elif dist > self._fail_distance_thresh:
+            elif dist > self._initial_dist + self._fail_distance_thresh:
                 logger.debug("loc: " + str(loc) + " goal: " + str(goal_loc) +
                              "dist: " + str(dist))
                 yield TeacherAction(reward=-1.0, sentence="Failed", done=True)
@@ -59,9 +90,26 @@ class GoalTask(teacher.Task):
                      "dist: " + str(dist))
         yield TeacherAction(reward=-1.0, sentence="Failed", done=True)
 
+    def _move_goal(self, goal, agent_loc):
+        while True:
+            loc = (random.random() * 2 - 1, random.random() * 2 - 1, 0)
+            self._initial_dist = np.linalg.norm(loc - agent_loc)
+            if self._initial_dist > 0.5:
+                break
+        goal.set_pose((loc, (0, 0, 0)))
+
 
 class DiscreteSequence(gym.Space):
+    """
+    gym.Space object for language sequence
+    """
+
     def __init__(self, vocab_size, max_length):
+        """
+        Arguments
+            vocab_size(int): number of different tokens
+            max_length(int): maximal length of the sequence
+        """
         super()
         self._vocab_size = vocab_size
         self._max_length = max_length
@@ -72,7 +120,8 @@ class DiscreteSequence(gym.Space):
 class SimpleNavigation(gym.Env):
     """
     In this environment, the agent will receive reward 1 when it is close enough to the goal.
-    If it is still not close to the goal after max_steps, it will get reward -1.
+    If it is moving away from the goal too much or still not close to the goal after max_steps,
+    it will get reward -1.
     """
 
     def __init__(self, with_language=True):
@@ -128,9 +177,13 @@ class SimpleNavigation(gym.Env):
     def step(self, action):
         """
         Arguments
-            action: a dictionary with key "control" and "sentence".
+            action(dict|int): If with_language, action is a dictionary with key "control" and "sentence".
                     action['control'] is a vector whose dimention is
-                    len(_joint_names). action['sentence'] is a string
+                    len(_joint_names). action['sentence'] is a string.
+                    If not with_language, it is an int for the action id.
+        Returns
+            If with_language, it is a dictionary with key 'obs' and 'sentence'
+            If not with_language, it is a numpy.array for observation
         """
         if self._with_language:
             sentence = action.get('sentence', None)
@@ -151,7 +204,6 @@ class SimpleNavigation(gym.Env):
         return (obs, teacher_action.reward, teacher_action.done, {})
 
     def reset(self):
-        self._new_world()
         self._teacher.reset(self._agent, self._world)
         teacher_action = self._teacher.teach("")
         image = self._agent.get_camera_observation("camera")
@@ -162,15 +214,6 @@ class SimpleNavigation(gym.Env):
             obs = image
         return obs
 
-    def _new_world(self):
-        goal = self._world.get_model("goal")
-        while True:
-            loc = (random.random() * 2 - 1, random.random() * 2 - 1, 0)
-            if np.linalg.norm(loc) > 0.5:
-                break
-        goal.set_pose((loc, (0, 0, 0)))
-        self._agent.reset()
-
 
 class SimpleNavigationNoLanguage(SimpleNavigation):
     def __init__(self):
@@ -178,6 +221,9 @@ class SimpleNavigationNoLanguage(SimpleNavigation):
 
 
 def main():
+    """
+    Simple testing of this enviroenment.
+    """
     env = SimpleNavigation()
     for _ in range(10000000):
         obs = env.reset()

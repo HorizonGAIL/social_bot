@@ -1,4 +1,8 @@
 # Copyright (c) 2019 Horizon Robotics. All Rights Reserved.
+"""
+A demonstration of Q learning for simple_navigation environment
+"""
+
 import gym
 import os
 import random
@@ -19,6 +23,9 @@ import torch.optim as optim
 
 
 class Options(object):
+    """
+    The class for all the settings
+    """
     max_steps = int(1e8)
     learning_rate = 5e-4
     history_length = 2
@@ -85,6 +92,12 @@ class Options(object):
 
 
 def main(options):
+    """
+    The entrance of the program
+    
+    Arguments
+        options(Options): options
+    """
     for attr in dir(options):
         if not attr.startswith('__'):
             logging.info(" %s=%s" % (attr, options.__getattribute__(attr)))
@@ -96,7 +109,7 @@ def main(options):
         image_shape=(image_shape[2], ) + options.resized_image_size,
         num_actions=options.action_discretize_levels**2,
         options=options)
-    rewards = deque(maxlen=options.log_freq)
+    episode_rewards = deque(maxlen=options.log_freq)
     steps = deque(maxlen=options.log_freq)
     end_q_values = deque(maxlen=options.log_freq)
     total_steps = 0
@@ -109,6 +122,7 @@ def main(options):
     episode_reward = 0.
     episode_steps = 0
     reward = 0
+    period_reward = 0
 
     logging.info(" mem=%dM" % (proc.memory_info().rss // 1e6))
 
@@ -122,11 +136,12 @@ def main(options):
         agent.learn(obs, action, reward, done)
         obs = new_obs
         episode_reward += reward
+        period_reward += reward
         episode_steps += 1
         total_steps += 1
         if done:
             episodes += 1
-            rewards.append(episode_reward)
+            episode_rewards.append(episode_reward)
             steps.append(episode_steps)
             end_q_values.append(q)
             reward = 0
@@ -140,14 +155,17 @@ def main(options):
                 " episodes=%s" % episodes + " total_steps=%s" % total_steps +
                 " fps=%.2f" % (options.log_freq / (time.time() - t0)) +
                 " mem=%dM" % (proc.memory_info().rss // 1e6) +
-                " avg_reward=%.3g" % (sum(rewards) / len(rewards)) +
+                " r_per_step=%.3g" % (period_reward / options.log_freq) +
+                " r_per_episode=%.3g" %
+                (sum(episode_rewards) / len(episode_rewards)) +
                 " avg_steps=%.3g" % (sum(steps) / len(steps)) +
                 " avg_end_q=%.3g" % (sum(end_q_values) / len(steps)) +
                 " max_end_q=%.3g" % max(end_q_values) +
                 " min_end_q=%.3g" % min(end_q_values) + agent.get_stats())
+            period_reward = 0
             agent.reset_stats()
-            rewards.clear()
             steps.clear()
+            episode_rewards.clear()
             end_q_values.clear()
             t0 = time.time()
 
@@ -161,6 +179,10 @@ Experience = namedtuple(
 
 
 class QAgent(object):
+    """
+    A simple Q learning agent for discrete action space
+    """
+
     def __init__(self, image_shape, num_actions, options):
         num_image_channels = image_shape[0]
         num_input_channels = num_image_channels * (options.history_length + 1)
@@ -198,6 +220,14 @@ class QAgent(object):
         return r / f
 
     def act(self, obs, reward):
+        """
+        Calcuate the action for the current step
+        Arguments:
+            obs(np.array): observation for the current step
+            reward(float): reward received for the previous step
+        Returns:
+            int: action id
+        """
         eps = self.get_exploration_rate()
         if len(self._history) > 0:
             self._history[-1] = self._history[-1]._replace(reward=reward)
@@ -269,6 +299,15 @@ class QAgent(object):
         self._replay_buffer.update_priority(indices, priorities)
 
     def learn(self, obs, action, reward, done):
+        """
+        Perform one stap of learning
+        
+        Arguments
+            obs(np.array): The observation
+            action(int): Action taken at this step
+            reward(float): Reward received for this step
+            done(bool): Whether reached the end of an episode
+        """
         self._ema_c = self._options.ema_reward_alpha * (
             self._options.discount_factor * self._ema_c - 1) + 1
         self._ema_r = self._options.ema_reward_alpha * self._ema_r + self._ema_c * reward
@@ -348,6 +387,12 @@ class QAgent(object):
                 target_param.data.copy_(param.data)
 
     def get_stats(self):
+        """
+        Get the internal statistics of this agnet
+        
+        Returns
+            A string showing all the statistics
+        """
         stats = ""
         stats += " exp_rate=%.3g" % self.get_exploration_rate()
         if self._options.ema_reward_alpha > 0:
@@ -423,6 +468,12 @@ class QAgent(object):
 
 
 def show_parameter_stats(module):
+    """
+    Show the parameter statistics for the neural net module
+    
+    Arguments
+        module(nn.Module): the statistics of this module will be shown.
+    """
     for name, para in module.named_parameters():
         if para.grad is None:
             continue
@@ -439,6 +490,10 @@ def show_parameter_stats(module):
 
 
 class Network(nn.Module):
+    """
+    The neural network module for calculating the Q values.
+    """
+
     def __init__(self, input_shape, num_actions):
         super(Network, self).__init__()
 
