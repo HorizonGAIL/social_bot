@@ -7,6 +7,7 @@ import logging
 import time
 import psutil
 import os
+import matplotlib.pyplot as plt
 
 
 def main():
@@ -21,6 +22,8 @@ def main():
         while True:
             obs, reward, done, info = env.step(
                 dict(control=control, sentence="hello"))
+            plt.imshow(obs["image"])
+            plt.pause(0.001)
             steps += 1
             if done:
                 logging.info("reward: " + str(reward) + "sent: " +

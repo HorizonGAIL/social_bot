@@ -8,21 +8,20 @@
     </physics>
     <!-- Ground -->
     <include>
-      <uri>model://texture_ground_plane</uri>
+      <uri>model://ground_plane</uri>
     </include>
     <!-- A global light source -->
     <include>
       <uri>model://sun</uri>
     </include>
 
-    <!-- cartpole model -->
     <model name="pr2">
       <include>
         <uri>model://pr2_noplugin</uri>
       </include>
     </model>
 
-        <model name='beer'>
+    <model name='beer'>
       <link name='link'>
         <pose frame=''>0 0 0.115 0 -0 0</pose>
         <inertial>
@@ -37,7 +36,7 @@
           </inertia>
           <pose frame=''>0 0 0 0 -0 0</pose>
         </inertial>
-        <collision name='collision'>
+        <collision name='beer_collision'>
           <geometry>
             <cylinder>
               <radius>0.055</radius>
@@ -76,6 +75,11 @@
         <self_collide>0</self_collide>
         <enable_wind>0</enable_wind>
         <kinematic>0</kinematic>
+        <sensor name='beer_contact' type='contact'>
+          <contact>
+            <collision>beer_collision</collision>
+          </contact>
+        </sensor>
       </link>
       <pose frame=''>0.849797 -0.014954 0 0 -0 0</pose>
     </model>

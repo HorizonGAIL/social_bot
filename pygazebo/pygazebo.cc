@@ -11,6 +11,7 @@
 #include <gazebo/physics/physics.hh>
 #include <gazebo/rendering/Camera.hh>
 #include <gazebo/sensors/CameraSensor.hh>
+#include <gazebo/sensors/ContactSensor.hh>
 #include <gazebo/sensors/Sensor.hh>
 #include <gazebo/sensors/SensorManager.hh>
 #include <gazebo/sensors/SensorsIface.hh>
@@ -97,6 +98,7 @@ class Model {
 class Agent : public Model {
  private:
   std::map<std::string, gazebo::sensors::CameraSensorPtr> cameras_;
+  std::map<std::string, gazebo::sensors::ContactSensorPtr> contacts_;
 
  public:
   explicit Agent(gazebo::physics::ModelPtr model) : Model(model) {}
@@ -133,6 +135,20 @@ class Agent : public Model {
     return state;
   }
 
+  Pose GetLinkPose(const std::string& link_name) const {
+    auto link = model_->GetLink(link_name);
+
+    if (!link) {
+      std::cerr << "unable to find link: " << link_name << std::endl;
+    }
+
+    auto pose = link->WorldPose();
+    auto euler = pose.Rot().Euler();
+    return std::make_tuple(
+        std::make_tuple(pose.Pos().X(), pose.Pos().Y(), pose.Pos().Z()),
+        std::make_tuple(euler.X(), euler.Y(), euler.Z()));
+  }
+
   void SetJointState(const std::string& joint_name,
                      const JointState& joint_state) {
     auto joint = model_->GetJoint(joint_name);
@@ -148,6 +164,28 @@ class Agent : public Model {
       joint->SetPosition(idx, joint_state.GetPositions()[idx]);
       joint->SetVelocity(idx, joint_state.GetVelocities()[idx]);
     }
+  }
+
+  unsigned int GetCollisionCount(const std::string& contact_sensor_name) {
+    auto it = contacts_.find(contact_sensor_name);
+
+    if (it == contacts_.end()) {
+      gazebo::sensors::SensorManager* mgr =
+          gazebo::sensors::SensorManager::Instance();
+
+      gazebo::sensors::ContactSensorPtr sensor =
+          std::dynamic_pointer_cast<gazebo::sensors::ContactSensor>(
+              mgr->GetSensor(contact_sensor_name));
+
+      if (!sensor) {
+        std::cerr << "unable to find sensor: " << contact_sensor_name
+                  << std::endl;
+      }
+
+      auto ret = contacts_.insert(std::make_pair(contact_sensor_name, sensor));
+      it = ret.first;
+    }
+    return it->second->GetCollisionCount();
   }
 
   CameraObservation GetCameraObservation(const std::string& sensor_scope_name) {
@@ -390,6 +428,10 @@ PYBIND11_MODULE(pygazebo, m) {
            &Agent::GetCameraObservation,
            py::arg("sensor_scope_name"))
       .def("get_joint_state", &Agent::GetJointState, py::arg("joint_name"))
+      .def("get_link_pose", &Agent::GetLinkPose, py::arg("link_name"))
+      .def("get_collision_count",
+           &Agent::GetCollisionCount,
+           py::arg("contact_sensor_name"))
       .def("set_joint_state",
            &Agent::SetJointState,
            py::arg("joint_name"),

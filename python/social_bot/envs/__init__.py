@@ -3,3 +3,4 @@
 from .simple_navigation import SimpleNavigation
 from .simple_navigation import SimpleNavigationNoLanguage
 from .cartpole import CartPole
+from .pr2 import Pr2Gripper

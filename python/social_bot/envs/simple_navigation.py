@@ -48,7 +48,7 @@ class GoalTask(teacher.Task):
         """
         Start a teaching episode for this task.
         Arguments
-            agent(pygazebo.Agent): the learning agent 
+            agent(pygazebo.Agent): the learning agent
             world(pygazebo.World): the simulation world
         """
         agent_sentence = yield
@@ -75,7 +75,7 @@ class GoalTask(teacher.Task):
                     logger.debug("loc: " + str(loc) + " goal: " +
                                  str(goal_loc) + "dist: " + str(dist))
                     agent_sentence = yield TeacherAction(
-                        reward=1.0, sentence="Well done!", done=False)
+                        reward=1.0, sentence="Well done!", done=True)
                     steps_since_last_reward = 0
                     self._move_goal(goal, loc)
                 else:
